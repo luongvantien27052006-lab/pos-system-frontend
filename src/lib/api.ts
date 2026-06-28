@@ -4,8 +4,15 @@
 //  >> CHEP DE (thay file co san)
 // ==================================================================
 
+// ==================================================================
+//  POS FRONTEND  (Next.js)
+//  Dat tai:  src/lib/api.ts
+//  >> CHEP DE (thay file co san)
+// ==================================================================
+
 import type {
   AddItemInput,
+  AdminOption,
   AdminProduct,
   AdminTable,
   AppOrder,
@@ -129,6 +136,26 @@ export const api = {
 
   // --- Quản trị sản phẩm ---
   listProducts: () => request<AdminProduct[]>('/products'),
+
+  // --- Topping / tùy chọn ---
+  listOptions: () => request<AdminOption[]>('/options'),
+  createOption: (body: { name: string; price: number; groupName?: string }) =>
+    request<AdminOption>('/options', { method: 'POST', body }),
+  updateOption: (
+    id: number,
+    body: { name?: string; price?: number; groupName?: string; isActive?: boolean },
+  ) => request<AdminOption>(`/options/${id}`, { method: 'PATCH', body }),
+  deleteOption: (id: number) =>
+    request<AdminOption>(`/options/${id}`, { method: 'DELETE' }),
+  restoreOption: (id: number) =>
+    request<AdminOption>(`/options/${id}/restore`, { method: 'PATCH' }),
+  getProductOptions: (productId: number) =>
+    request<number[]>(`/options/product/${productId}`),
+  setProductOptions: (productId: number, optionIds: number[]) =>
+    request<{ productId: number; optionIds: number[] }>(
+      `/options/product/${productId}`,
+      { method: 'PUT', body: { optionIds } },
+    ),
   deleteProduct: (id: number) =>
     request<{ ok: boolean; id: number }>(`/products/${id}`, {
       method: 'DELETE',

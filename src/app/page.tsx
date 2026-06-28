@@ -1,3 +1,9 @@
+// ==================================================================
+//  POS FRONTEND  (Next.js)
+//  Dat tai:  src/app/page.tsx
+//  >> CHEP DE (thay file co san)
+// ==================================================================
+
 import Link from 'next/link';
 
 const surfaces = [
@@ -23,6 +29,12 @@ const surfaces = [
     href: '/admin/products',
     title: 'Quản lý món',
     desc: 'Thêm món, upload ảnh, ngừng bán',
+    tag: 'Admin',
+  },
+  {
+    href: '/admin/toppings',
+    title: 'Quản lý topping',
+    desc: 'Tạo topping, gán cho từng món',
     tag: 'Admin',
   },
   {
