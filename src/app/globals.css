@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 30% 98%; /* trắng ấm */
+    --foreground: 24 14% 12%; /* mực espresso */
+
+    --card: 0 0% 100%;
+    --card-foreground: 24 14% 12%;
+
+    --muted: 36 22% 94%;
+    --muted-foreground: 28 8% 42%;
+
+    --border: 34 20% 89%;
+    --input: 34 20% 89%;
+
+    --primary: 24 16% 14%; /* nút chính: gần đen ấm */
+    --primary-foreground: 40 30% 98%;
+
+    --accent: 28 84% 46%; /* hổ phách / honey (thương hiệu) */
+    --accent-foreground: 0 0% 100%;
+
+    --success: 152 50% 36%; /* PAID */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%; /* cảnh báo tiền mặt (vàng) */
+    --warning-foreground: 30 45% 12%;
+
+    --info: 211 75% 46%; /* chuyển khoản */
+    --info-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 48%; /* đỏ — hủy đơn */
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 28 84% 46%;
+    --radius: 0.85rem;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  /* Số tiền canh cột thẳng hàng — chi tiết quan trọng của một POS */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
