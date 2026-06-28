@@ -35,13 +35,9 @@ export async function POST(req: Request) {
       cache: 'no-store',
     });
     if (r.ok) {
-      const data = await r.json();
-      // 🚨 THIẾT BỊ GIÁM SÁT TRÊN FRONTEND
-      console.log("==========================================");
-      console.log("[FRONTEND XEM ĐÁP ÁN] Backend trả về cục data này nè:", data);
-      console.log("==========================================");
-      ok = typeof data === 'boolean' ? data : !!data?.ok;
-    }
+  const data = await r.json();
+  ok = typeof data === 'boolean' ? data : !!data?.ok;
+}
   } catch {
     return NextResponse.json(
       { message: 'Không kết nối được máy chủ' },
