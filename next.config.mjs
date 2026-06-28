@@ -1,14 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    // Cho phép ảnh món & ảnh VietQR từ domain ngoài. Siết lại danh sách khi lên production.
-    remotePatterns: [{ protocol: 'https', hostname: '**' }],
-  },
-};
+  // 👇 CỨ GIỮ NGUYÊN CÁC CẤU HÌNH CŨ CỦA BẠN (NẾU CÓ) Ở ĐÂY...
+  // ví dụ: reactStrictMode: true, 
 
-export default nextConfig;
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+  // 👇 CHỈ PHƠT THÊM ĐOẠN IMAGES NÀY VÀO TRONG THÔI:
   images: {
     remotePatterns: [
       {
