@@ -35,8 +35,9 @@ export async function POST(req: Request) {
       cache: 'no-store',
     });
     if (r.ok) {
-      const data = (await r.json()) as { ok?: boolean };
-      ok = !!data.ok;
+      const data = await r.json();
+      // Chấp nhận cả 2 trường hợp: Backend trả về thẳng true/false HOẶC trả về dạng object { ok: true }
+      ok = typeof data === 'boolean' ? data : !!data?.ok;
     }
   } catch {
     return NextResponse.json(
