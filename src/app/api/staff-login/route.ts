@@ -36,7 +36,10 @@ export async function POST(req: Request) {
     });
     if (r.ok) {
       const data = await r.json();
-      // Chấp nhận cả 2 trường hợp: Backend trả về thẳng true/false HOẶC trả về dạng object { ok: true }
+      // 🚨 THIẾT BỊ GIÁM SÁT TRÊN FRONTEND
+      console.log("==========================================");
+      console.log("[FRONTEND XEM ĐÁP ÁN] Backend trả về cục data này nè:", data);
+      console.log("==========================================");
       ok = typeof data === 'boolean' ? data : !!data?.ok;
     }
   } catch {
