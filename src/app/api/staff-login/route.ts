@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       { status: 502 },
     );
   }
-ok = true;
+
   if (!ok) {
     return NextResponse.json({ message: 'Sai mã PIN' }, { status: 401 });
   }
