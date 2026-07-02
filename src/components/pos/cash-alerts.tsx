@@ -1,10 +1,17 @@
+// ============================================================
+//  POS FRONTEND (Next.js 14)
+//  src/components/pos/cash-alerts.tsx
+//  >> CHEP DE (hien danh sach mon khach da chon trong canh bao tien mat)
+// ============================================================
+
 'use client';
 
-import { useCallback, useState } from 'react';
-import { Banknote, QrCode } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Banknote, Loader2, QrCode } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useSocketEvent } from '@/lib/socket';
 import {
+  type OrderLine,
   type OrderPaidEvent,
   type OrderPendingCashEvent,
   type PendingCashAlert,
@@ -77,41 +84,13 @@ export function CashAlerts({ initial }: { initial: PendingCashAlert[] }) {
       {alerts.length > 0 && (
         <div className="space-y-2 bg-warning/15 p-3">
           {alerts.map((a) => (
-            <div
+            <AlertCard
               key={a.sessionId}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-warning bg-card p-3"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning text-warning-foreground">
-                  <Banknote className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-bold">
-                    {a.tableNumber ? `Bàn ${a.tableNumber}` : 'Mang đi'} yêu cầu
-                    trả tiền mặt
-                  </p>
-                  <p className="text-lg font-extrabold tabular text-warning-foreground">
-                    {formatVnd(a.amount)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={busy === a.sessionId}
-                  onClick={() => showQr(a.sessionId)}
-                >
-                  <QrCode className="h-4 w-4" /> Hiện mã QR
-                </Button>
-                <Button
-                  variant="success"
-                  disabled={busy === a.sessionId}
-                  onClick={() => confirm(a.sessionId)}
-                >
-                  <Banknote className="h-4 w-4" /> Đã nhận tiền
-                </Button>
-              </div>
-            </div>
+              alert={a}
+              busy={busy === a.sessionId}
+              onConfirm={() => confirm(a.sessionId)}
+              onShowQr={() => showQr(a.sessionId)}
+            />
           ))}
         </div>
       )}
@@ -120,5 +99,106 @@ export function CashAlerts({ initial }: { initial: PendingCashAlert[] }) {
         <QrDialog qr={activeQr.info} onClose={() => setActiveQr(null)} />
       )}
     </>
+  );
+}
+
+/** Một cảnh báo tiền mặt: tự nạp chi tiết phiên để hiện danh sách món khách đã đặt. */
+function AlertCard({
+  alert,
+  busy,
+  onConfirm,
+  onShowQr,
+}: {
+  alert: PendingCashAlert;
+  busy: boolean;
+  onConfirm: () => void;
+  onShowQr: () => void;
+}) {
+  const [lines, setLines] = useState<OrderLine[] | null>(null);
+  const [loadingLines, setLoadingLines] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const s = await api.getSession(alert.sessionId);
+        if (active) setLines(s.lines);
+      } catch {
+        if (active) setLines([]);
+      } finally {
+        if (active) setLoadingLines(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [alert.sessionId]);
+
+  return (
+    <div className="rounded-xl border-2 border-warning bg-card p-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning text-warning-foreground">
+            <Banknote className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="font-bold">
+              {alert.tableNumber ? `Bàn ${alert.tableNumber}` : 'Mang đi'} yêu
+              cầu trả tiền mặt
+            </p>
+            <p className="text-lg font-extrabold tabular text-warning-foreground">
+              {formatVnd(alert.amount)}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" disabled={busy} onClick={onShowQr}>
+            <QrCode className="h-4 w-4" /> Hiện mã QR
+          </Button>
+          <Button variant="success" disabled={busy} onClick={onConfirm}>
+            <Banknote className="h-4 w-4" /> Đã nhận tiền
+          </Button>
+        </div>
+      </div>
+
+      {/* Danh sách món khách đã chọn */}
+      <div className="mt-3 border-t border-warning/30 pt-2">
+        {loadingLines ? (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Đang tải món…
+          </p>
+        ) : lines && lines.length > 0 ? (
+          <ul className="space-y-1.5">
+            {lines.map((l) => (
+              <li
+                key={l.id}
+                className="flex items-start justify-between gap-3 text-sm"
+              >
+                <span className="min-w-0">
+                  <span className="font-medium">
+                    {l.quantity}× {l.name}
+                  </span>
+                  {l.toppings.length > 0 && (
+                    <span className="block text-xs text-muted-foreground">
+                      {l.toppings.map((t) => t.name).join(', ')}
+                    </span>
+                  )}
+                  {l.note && (
+                    <span className="block text-xs italic text-muted-foreground">
+                      Ghi chú: {l.note}
+                    </span>
+                  )}
+                </span>
+                <span className="shrink-0 tabular text-muted-foreground">
+                  {formatVnd(l.lineTotal)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground">Không có món.</p>
+        )}
+      </div>
+    </div>
   );
 }
