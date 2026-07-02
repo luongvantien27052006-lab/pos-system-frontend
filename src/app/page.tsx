@@ -32,6 +32,12 @@ const surfaces = [
     tag: 'Admin',
   },
   {
+    href: '/admin/news',
+    title: 'Quản lý tin tức',
+    desc: 'Đăng tin, thông báo cửa hàng cho khách',
+    tag: 'Admin',
+  },
+  {
     href: '/admin/toppings',
     title: 'Quản lý topping',
     desc: 'Tạo topping, gán cho từng món',

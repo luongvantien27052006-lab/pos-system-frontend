@@ -4,12 +4,6 @@
 //  >> CHEP DE (thay file co san)
 // ==================================================================
 
-// ==================================================================
-//  POS FRONTEND  (Next.js)
-//  Dat tai:  src/lib/api.ts
-//  >> CHEP DE (thay file co san)
-// ==================================================================
-
 import type {
   AddItemInput,
   AdminOption,
@@ -25,6 +19,7 @@ import type {
   RevenueSummary,
   StoreHours,
   TableInfo,
+  NewsItem,
 } from '@/types';
 
 const BASE_URL =
@@ -225,4 +220,62 @@ export const api = {
   // --- Cài đặt nhân viên ---
   changePin: (body: { currentPin: string; newPin: string }) =>
     request<{ ok: boolean }>('/staff/change-pin', { method: 'POST', body }),
+
+  // --- Quản trị tin tức (proxy sang App backend) ---
+  listNewsAdmin: async (): Promise<NewsItem[]> => {
+    const r = await request<any>('/news?limit=50');
+    const items =
+      (r && r.data && r.data.items) ?? (r && r.items) ?? (Array.isArray(r) ? r : []);
+    return items as NewsItem[];
+  },
+  createNews: async (body: {
+    title: string;
+    summary: string | null;
+    content: string;
+    imageUrl: string | null;
+    isPublished: boolean;
+  }): Promise<NewsItem> => {
+    const r = await request<any>('/news', { method: 'POST', body });
+    return ((r && r.data) ?? r) as NewsItem;
+  },
+  updateNews: async (
+    id: string,
+    body: Partial<{
+      title: string;
+      summary: string | null;
+      content: string;
+      imageUrl: string | null;
+      isPublished: boolean;
+    }>,
+  ): Promise<NewsItem> => {
+    const r = await request<any>(`/news/${id}`, { method: 'PATCH', body });
+    return ((r && r.data) ?? r) as NewsItem;
+  },
+  deleteNews: (id: string) =>
+    request<unknown>(`/news/${id}`, { method: 'DELETE' }),
+  uploadNewsImage: async (file: File): Promise<string> => {
+    const form = new FormData();
+    form.append('image', file);
+    const res = await fetch(`${BASE_URL}/news/image`, {
+      method: 'POST',
+      body: form,
+    });
+    if (!res.ok) {
+      let message = `Lỗi ${res.status}`;
+      try {
+        const data = (await res.json()) as { message?: string | string[] };
+        if (data?.message) {
+          message = Array.isArray(data.message)
+            ? data.message.join(', ')
+            : data.message;
+        }
+      } catch {
+        /* giữ message mặc định */
+      }
+      throw new ApiError(res.status, message);
+    }
+    const json = (await res.json()) as { url?: string };
+    if (!json.url) throw new ApiError(500, 'Upload ảnh không trả URL');
+    return json.url;
+  },
 };

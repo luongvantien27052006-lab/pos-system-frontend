@@ -4,12 +4,6 @@
 //  >> CHEP DE (thay file co san)
 // ==================================================================
 
-// ==================================================================
-//  POS FRONTEND  (Next.js)
-//  Dat tai:  src/types/index.ts
-//  >> CHEP DE (thay file co san)
-// ==================================================================
-
 // ===== Khớp với view trả về từ backend (Phần 2) =====
 
 export type OrderStatus = 'UNPAID' | 'PENDING_CASH' | 'PAID' | 'CANCELLED';
@@ -147,6 +141,17 @@ export interface AdminProduct {
   isActive: boolean;
   categoryId: number;
   categoryName?: string;
+}
+
+// --- Quản trị tin tức ---
+export interface NewsItem {
+  id: string;
+  title: string;
+  summary: string | null;
+  content: string;
+  imageUrl: string | null;
+  isPublished: boolean;
+  publishedAt: string | null;
 }
 
 // --- Quản trị topping/tùy chọn ---
