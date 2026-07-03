@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'POS Cà phê',
   description: 'Hệ thống order & thanh toán thời gian thực cho quán cà phê',
 verification: {
-    google: "google2c0bf3db5550904c", // Điền chuỗi mã của bạn vào đây
+    google: "x54UWYymhuf4O2sFLObFonUdUwLaCGowYmZusYU3Bzc", // Điền chuỗi mã của bạn vào đây
   },
 };
 
