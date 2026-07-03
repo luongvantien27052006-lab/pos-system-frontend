@@ -70,7 +70,6 @@ export default function HomePage() {
         <p className="text-muted-foreground">
           Hệ thống order &amp; thanh toán thời gian thực.
         </p>
-<meta name="google-site-verification" content="x54UWYymhuf4O2sFLObFonUdUwLaCGowYmZusYU3Bzc" />
       </header>
 
       <div className="grid gap-3">
