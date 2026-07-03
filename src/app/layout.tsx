@@ -12,6 +12,9 @@ const beVietnamPro = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   title: 'POS Cà phê',
   description: 'Hệ thống order & thanh toán thời gian thực cho quán cà phê',
+verification: {
+    google: "google2c0bf3db5550904c", // Điền chuỗi mã của bạn vào đây
+  },
 };
 
 export const viewport: Viewport = {
