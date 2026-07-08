@@ -1,3 +1,8 @@
+// ============================================================
+//  POS FRONTEND  src/app/page.tsx
+//  >> CHEP DE (an o theo role)
+// ============================================================
+
 // ==================================================================
 //  POS FRONTEND  (Next.js)
 //  Dat tai:  src/app/page.tsx
@@ -5,6 +10,7 @@
 // ==================================================================
 
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 
 const surfaces = [
   {
@@ -29,6 +35,12 @@ const surfaces = [
     href: '/admin/products',
     title: 'Quản lý món',
     desc: 'Thêm món, upload ảnh, ngừng bán',
+    tag: 'Admin',
+  },
+  {
+    href: '/admin/vouchers',
+    title: 'Quản lý voucher',
+    desc: 'Tạo mã giảm giá, voucher người mới',
     tag: 'Admin',
   },
   {
@@ -58,6 +70,13 @@ const surfaces = [
 ];
 
 export default function HomePage() {
+  const adminToken = process.env.ADMIN_SESSION_TOKEN;
+  const isAdmin =
+    !adminToken || cookies().get('staff_session')?.value === adminToken;
+  const staffPaths = ['/menu', '/pos', '/dashboard'];
+  const visible = isAdmin
+    ? surfaces
+    : surfaces.filter((s) => staffPaths.some((p) => s.href.startsWith(p)));
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-8 px-6 py-16">
       <header className="space-y-2">
@@ -73,7 +92,7 @@ export default function HomePage() {
       </header>
 
       <div className="grid gap-3">
-        {surfaces.map((s) => (
+        {visible.map((s) => (
           <Link
             key={s.href}
             href={s.href}

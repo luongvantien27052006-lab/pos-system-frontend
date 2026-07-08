@@ -1,9 +1,15 @@
+// ============================================================
+//  POS FRONTEND  src/app/admin/settings/change-pin-form.tsx
+//  >> CHEP DE (chon staff/admin)
+// ============================================================
+
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, KeyRound, Loader2 } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Toast, type ToastState } from '@/components/ui/toast';
 
@@ -11,6 +17,7 @@ const inputClass =
   'w-full rounded-xl border bg-background px-4 py-3 text-center text-lg tracking-widest outline-none transition focus:border-accent';
 
 export function ChangePinForm() {
+  const [target, setTarget] = useState<'staff' | 'admin'>('staff');
   const [currentPin, setCurrentPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
@@ -27,7 +34,7 @@ export function ChangePinForm() {
 
     setLoading(true);
     try {
-      await api.changePin({ currentPin: currentPin.trim(), newPin });
+      await api.changePin({ currentPin: currentPin.trim(), newPin, target });
       setToast({ type: 'success', message: 'Đã đổi mã PIN' });
       setCurrentPin('');
       setNewPin('');
@@ -58,11 +65,41 @@ export function ChangePinForm() {
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
             <KeyRound className="h-5 w-5" />
           </span>
-          <h1 className="text-lg font-bold">Đổi mã PIN nhân viên</h1>
+          <h1 className="text-lg font-bold">Đổi mã PIN</h1>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Mã PIN hiện tại</label>
+          <label className="mb-1 block text-sm font-medium">Đổi PIN cho</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setTarget('staff')}
+              className={cn(
+                'rounded-xl border py-2 text-sm font-medium transition',
+                target === 'staff'
+                  ? 'border-accent bg-accent/10 text-accent'
+                  : 'text-muted-foreground',
+              )}
+            >
+              Nhân viên
+            </button>
+            <button
+              type="button"
+              onClick={() => setTarget('admin')}
+              className={cn(
+                'rounded-xl border py-2 text-sm font-medium transition',
+                target === 'admin'
+                  ? 'border-accent bg-accent/10 text-accent'
+                  : 'text-muted-foreground',
+              )}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">Mã PIN admin hiện tại</label>
           <input
             type="password"
             inputMode="numeric"

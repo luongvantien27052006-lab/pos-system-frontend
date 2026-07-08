@@ -143,6 +143,22 @@ export interface AdminProduct {
   categoryName?: string;
 }
 
+// --- Quản trị voucher ---
+export interface VoucherItem {
+  id: string;
+  code: string;
+  name: string;
+  type: string;
+  discount_value: string | number;
+  min_order_value: string | number;
+  total_usage_limit: number | null;
+  total_used_count: number;
+  per_user_limit: number;
+  start_date: string;
+  end_date: string;
+  status: string;
+}
+
 // --- Quản trị tin tức ---
 export interface NewsItem {
   id: string;

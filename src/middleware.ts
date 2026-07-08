@@ -1,29 +1,49 @@
+// ============================================================
+//  POS FRONTEND  src/middleware.ts
+//  >> CHEP DE (staff: /pos + /dashboard)
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Gác toàn bộ route NHÂN VIÊN ( /, /pos, /dashboard, /admin/* ) sau mã PIN.
- * Route KHÁCH /menu (mã QR trên bàn trỏ tới đây) luôn mở, không cần đăng nhập.
- *
- * Cơ chế: sau khi nhập đúng PIN, /api/staff-login đặt cookie 'staff_session'
- * = STAFF_SESSION_TOKEN. Middleware so cookie với token này.
- * Nếu chưa cấu hình STAFF_SESSION_TOKEN -> tắt gác (tiện môi trường dev).
+ * Gác route sau mã PIN + phân quyền:
+ *  - Admin (cookie = ADMIN_SESSION_TOKEN): toàn quyền.
+ *  - Nhân viên (cookie = STAFF_SESSION_TOKEN): chỉ '/', '/pos', '/dashboard'.
+ *  - Route khách '/menu' luôn mở.
  */
 export function middleware(req: NextRequest) {
-  const token = process.env.STAFF_SESSION_TOKEN;
-  if (!token) return NextResponse.next(); // gác chưa bật
+  const staffToken = process.env.STAFF_SESSION_TOKEN;
+  if (!staffToken) return NextResponse.next(); // gác chưa bật
 
-  const authed = req.cookies.get('staff_session')?.value === token;
-  if (authed) return NextResponse.next();
+  const adminToken = process.env.ADMIN_SESSION_TOKEN;
+  const cookie = req.cookies.get('staff_session')?.value;
+  const isAdmin = !!adminToken && cookie === adminToken;
+  const isStaff = cookie === staffToken;
+
+  if (!isAdmin && !isStaff) {
+    const url = req.nextUrl.clone();
+    url.pathname = '/staff-login';
+    url.search = `?next=${encodeURIComponent(req.nextUrl.pathname)}`;
+    return NextResponse.redirect(url);
+  }
+
+  if (isAdmin) return NextResponse.next();
+
+  // Nhân viên: chỉ cho POS (thu ngân) + Doanh thu + trang chủ.
+  const path = req.nextUrl.pathname;
+  const staffAllowed =
+    path === '/' ||
+    path.startsWith('/pos') ||
+    path.startsWith('/dashboard');
+  if (staffAllowed) return NextResponse.next();
 
   const url = req.nextUrl.clone();
-  url.pathname = '/staff-login';
-  url.search = `?next=${encodeURIComponent(req.nextUrl.pathname)}`;
+  url.pathname = '/pos';
+  url.search = '';
   return NextResponse.redirect(url);
 }
 
 export const config = {
-  // Áp dụng cho MỌI đường dẫn TRỪ: trang khách /menu, trang đăng nhập,
-  // API nội bộ Next, và tài nguyên tĩnh.
   matcher: [
     '/((?!menu|staff-login|api|_next/static|_next/image|favicon.ico).*)',
   ],

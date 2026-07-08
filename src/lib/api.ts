@@ -1,3 +1,8 @@
+// ============================================================
+//  POS FRONTEND  src/lib/api.ts
+//  >> CHEP DE (changePin them target)
+// ============================================================
+
 // ==================================================================
 //  POS FRONTEND  (Next.js)
 //  Dat tai:  src/lib/api.ts
@@ -20,6 +25,7 @@ import type {
   StoreHours,
   TableInfo,
   NewsItem,
+  VoucherItem,
 } from '@/types';
 
 const BASE_URL =
@@ -218,7 +224,7 @@ export const api = {
     }),
 
   // --- Cài đặt nhân viên ---
-  changePin: (body: { currentPin: string; newPin: string }) =>
+  changePin: (body: { currentPin: string; newPin: string; target?: 'staff' | 'admin' }) =>
     request<{ ok: boolean }>('/staff/change-pin', { method: 'POST', body }),
 
   // --- Quản trị tin tức (proxy sang App backend) ---
@@ -277,5 +283,26 @@ export const api = {
     const json = (await res.json()) as { url?: string };
     if (!json.url) throw new ApiError(500, 'Upload ảnh không trả URL');
     return json.url;
+  },
+  // --- Quản trị voucher (proxy sang App backend) ---
+  listVouchers: async (): Promise<VoucherItem[]> => {
+    const r = await request<any>('/vouchers?limit=100');
+    const items =
+      (r && r.data && r.data.items) ?? (r && r.items) ?? (Array.isArray(r) ? r : []);
+    return items as VoucherItem[];
+  },
+  createVoucher: async (body: {
+    code: string;
+    name: string;
+    type: string;
+    discountValue: number;
+    minOrderValue?: number;
+    totalUsageLimit?: number;
+    perUserLimit?: number;
+    startDate: string;
+    endDate: string;
+  }): Promise<VoucherItem> => {
+    const r = await request<any>('/vouchers', { method: 'POST', body });
+    return ((r && r.data) ?? r) as VoucherItem;
   },
 };
