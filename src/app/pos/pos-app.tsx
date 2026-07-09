@@ -1,3 +1,8 @@
+// ============================================================
+//  POS FRONTEND  src/app/pos/pos-app.tsx
+//  >> CHEP DE (gan PrinterAlert)
+// ============================================================
+
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
@@ -7,6 +12,7 @@ import { socketRooms } from '@/lib/socket';
 import { type CartItem, makeCartItem } from '@/lib/cart';
 import type { Menu, MenuProduct, PendingCashAlert } from '@/types';
 import { CashAlerts } from '@/components/pos/cash-alerts';
+import { PrinterAlert } from '@/components/pos/printer-alert';
 import { MenuPanel } from '@/components/pos/menu-panel';
 import { OnlineOrders } from '@/components/pos/online-orders';
 import { OrderPanel } from '@/components/pos/order-panel';
@@ -92,6 +98,7 @@ export function PosApp() {
 
   return (
     <div className="flex h-dvh flex-col">
+      <PrinterAlert />
       <CashAlerts initial={alerts} />
       <OnlineOrders />
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[1fr_400px]">

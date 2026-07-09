@@ -1,6 +1,6 @@
 // ============================================================
 //  POS FRONTEND  src/lib/api.ts
-//  >> CHEP DE (changePin them target)
+//  >> CHEP DE (printHealth + reprintBill)
 // ============================================================
 
 // ==================================================================
@@ -123,6 +123,18 @@ export const api = {
   // --- Thanh toán ---
   payCash: (sessionId: number) =>
     request<OrderSession>(`/orders/${sessionId}/pay/cash`, { method: 'POST' }),
+  // --- Máy in: sức khoẻ hàng đợi + in lại bill ---
+  printHealth: () =>
+    request<{
+      pending: number;
+      stuckCount: number;
+      lastPrintedAt: string | null;
+      agentAlive: boolean;
+    }>('/print/health'),
+
+  reprintBill: (sessionId: number) =>
+    request<{ ok: boolean }>(`/orders/${sessionId}/reprint`, { method: 'POST' }),
+
   confirmCash: (sessionId: number) =>
     request<OrderSession>(`/orders/${sessionId}/pay/cash/confirm`, {
       method: 'POST',

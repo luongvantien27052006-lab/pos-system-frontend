@@ -1,4 +1,9 @@
 // ============================================================
+//  POS FRONTEND  src/components/pos/cash-alerts.tsx
+//  >> CHEP DE (nut In lai bill)
+// ============================================================
+
+// ============================================================
 //  POS FRONTEND (Next.js 14)
 //  src/components/pos/cash-alerts.tsx
 //  >> CHEP DE (hien danh sach mon khach da chon trong canh bao tien mat)
@@ -7,7 +12,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Banknote, Loader2, QrCode } from 'lucide-react';
+import { Banknote, Loader2, Printer, QrCode } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useSocketEvent } from '@/lib/socket';
 import {
@@ -116,6 +121,7 @@ function AlertCard({
 }) {
   const [lines, setLines] = useState<OrderLine[] | null>(null);
   const [loadingLines, setLoadingLines] = useState(true);
+  const [reprinting, setReprinting] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -152,6 +158,25 @@ function AlertCard({
           </div>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            disabled={reprinting}
+            onClick={async () => {
+              setReprinting(true);
+              try {
+                await api.reprintBill(alert.sessionId);
+              } finally {
+                setReprinting(false);
+              }
+            }}
+          >
+            {reprinting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Printer className="h-4 w-4" />
+            )}
+            In lại bill
+          </Button>
           <Button variant="outline" disabled={busy} onClick={onShowQr}>
             <QrCode className="h-4 w-4" /> Hiện mã QR
           </Button>
