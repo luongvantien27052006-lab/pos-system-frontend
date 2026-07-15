@@ -1,7 +1,6 @@
 // ============================================================
-//  POS FRONTEND (Next.js)
-//  src/app/admin/vouchers/vouchers-admin.tsx
-//  >> FILE MOI (trang tao voucher)
+//  POS FRONTEND  src/app/admin/vouchers/vouchers-admin.tsx
+//  >> CHEP DE (them o Giam toi da + Don toi thieu)
 // ============================================================
 
 'use client';
@@ -43,6 +42,7 @@ export function VouchersAdmin() {
   const [type, setType] = useState('PERCENTAGE');
   const [discountValue, setDiscountValue] = useState('20');
   const [minOrderValue, setMinOrderValue] = useState('0');
+  const [maxDiscountAmount, setMaxDiscountAmount] = useState('');
   const [totalUsageLimit, setTotalUsageLimit] = useState('');
   const [perUserLimit, setPerUserLimit] = useState('1');
   const [startDate, setStartDate] = useState(plusDaysLocal(0));
@@ -67,6 +67,7 @@ export function VouchersAdmin() {
     setType('PERCENTAGE');
     setDiscountValue('20');
     setMinOrderValue('0');
+    setMaxDiscountAmount('');
     setTotalUsageLimit('');
     setPerUserLimit('1');
     setStartDate(plusDaysLocal(0));
@@ -87,6 +88,10 @@ export function VouchersAdmin() {
         type,
         discountValue: disc,
         minOrderValue: Number(minOrderValue) || 0,
+        maxDiscountAmount:
+          type === 'PERCENTAGE' && maxDiscountAmount
+            ? Number(maxDiscountAmount)
+            : undefined,
         totalUsageLimit: totalUsageLimit ? Number(totalUsageLimit) : undefined,
         perUserLimit: Number(perUserLimit) || 1,
         startDate: new Date(startDate).toISOString(),
@@ -152,6 +157,23 @@ export function VouchersAdmin() {
             <label className="mb-1 block text-sm font-medium">Đơn tối thiểu (đ)</label>
             <input className={inputClass} type="number" value={minOrderValue} onChange={(e) => setMinOrderValue(e.target.value)} />
           </div>
+          {type === 'PERCENTAGE' && (
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Giảm tối đa (đ)
+              </label>
+              <input
+                className={inputClass}
+                type="number"
+                value={maxDiscountAmount}
+                onChange={(e) => setMaxDiscountAmount(e.target.value)}
+                placeholder="Không giới hạn"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                VD: giảm 40% nhưng tối đa 30.000đ.
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-sm font-medium">Tổng lượt (toàn bộ)</label>
@@ -201,6 +223,9 @@ export function VouchersAdmin() {
                       <div className="font-semibold">{v.name}</div>
                       <div className="text-xs text-muted-foreground">
                         Mã <b>{v.code}</b> · {isPct ? `Giảm ${disc}%` : `Giảm ${fmtVnd(disc)}`}
+                        {isPct && Number(v.max_discount_amount) > 0
+                          ? ` (tối đa ${fmtVnd(Number(v.max_discount_amount))})`
+                          : ''}
                       </div>
                       <div className="mt-1 text-xs text-muted-foreground">
                         HSD {fmtDate(v.end_date)} · Giới hạn {v.per_user_limit}/người ·{' '}

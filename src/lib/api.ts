@@ -1,6 +1,6 @@
 // ============================================================
 //  POS FRONTEND  src/lib/api.ts
-//  >> CHEP DE (printHealth + reprintBill)
+//  >> CHEP DE (createVoucher them maxDiscountAmount)
 // ============================================================
 
 // ==================================================================
@@ -309,6 +309,7 @@ export const api = {
     type: string;
     discountValue: number;
     minOrderValue?: number;
+    maxDiscountAmount?: number;
     totalUsageLimit?: number;
     perUserLimit?: number;
     startDate: string;

@@ -1,3 +1,8 @@
+// ============================================================
+//  POS FRONTEND  src/types/index.ts
+//  >> CHEP DE (VoucherItem them max_discount_amount)
+// ============================================================
+
 // ==================================================================
 //  POS FRONTEND  (Next.js)
 //  Dat tai:  src/types/index.ts
@@ -151,6 +156,7 @@ export interface VoucherItem {
   type: string;
   discount_value: string | number;
   min_order_value: string | number;
+  max_discount_amount: string | number | null;
   total_usage_limit: number | null;
   total_used_count: number;
   per_user_limit: number;
