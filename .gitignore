@@ -1,0 +1,33 @@
+# Thư mục chứa các thư viện cài đặt (Rất nặng, không được push)
+node_modules/
+
+# Thư mục build và sản phẩm đầu ra của Next.js
+.next/
+out/
+build/
+
+# Các file cấu hình môi trường chứa thông tin bảo mật (Bắt buộc phải chặn)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Các file Logs của hệ thống khi chạy lệnh npm/yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# File hệ thống của hệ điều hành tự sinh ra
+.DS_Store
+Thumbs.db
+
+# Thư mục cấu hình riêng của các IDE (VS Code, WebStorm) - Tùy chọn
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
