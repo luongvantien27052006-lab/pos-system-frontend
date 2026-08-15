@@ -71,6 +71,22 @@ async function request<T>(
   return (res.status === 204 ? undefined : await res.json()) as T;
 }
 
+// Món trái cây (nằm ở App backend; id là UUID; kèm options size).
+export type FruitOption = {
+  id: string;
+  name: string;
+  price: number;
+  groupName?: string;
+};
+export type FruitProduct = {
+  id: string;
+  name: string;
+  price: number;
+  category?: string;
+  is_available?: boolean;
+  options?: FruitOption[];
+};
+
 export const api = {
   // --- Menu & bàn ---
   getMenu: () => request<Menu>('/menu'),
@@ -318,4 +334,33 @@ export const api = {
     const r = await request<any>('/vouchers', { method: 'POST', body });
     return ((r && r.data) ?? r) as VoucherItem;
   },
+
+  // --- Quản trị Trái cây (proxy sang App backend) ---
+  listFruits: async (): Promise<FruitProduct[]> => {
+    const r = await request<any>(
+      `/fruits?category=${encodeURIComponent('Trái cây chấm muối')}&limit=1000`,
+    );
+    const items =
+      (r && r.items) ?? (r && r.data && r.data.items) ?? (Array.isArray(r) ? r : []);
+    return items as FruitProduct[];
+  },
+  createFruit: (body: {
+    name: string;
+    category: string;
+    price: number;
+    displayOrder?: number;
+    isAvailable?: boolean;
+    options: FruitOption[];
+  }) => request<FruitProduct>('/fruits', { method: 'POST', body }),
+  updateFruit: (
+    id: string,
+    body: Partial<{
+      name: string;
+      price: number;
+      isAvailable: boolean;
+      options: FruitOption[];
+    }>,
+  ) => request<FruitProduct>(`/fruits/${id}`, { method: 'PATCH', body }),
+  deleteFruit: (id: string) =>
+    request<{ ok: boolean; id: string }>(`/fruits/${id}`, { method: 'DELETE' }),
 };
