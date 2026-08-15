@@ -87,6 +87,27 @@ export type FruitProduct = {
   options?: FruitOption[];
 };
 
+// Bill lịch sử bán hàng (quầy + bàn + app).
+export type BillTopping = { name: string; unitPrice: number };
+export type BillItem = {
+  name: string;
+  unitPrice: number;
+  quantity: number;
+  toppings: BillTopping[];
+};
+export type Bill = {
+  source: 'COUNTER' | 'TABLE' | 'APP';
+  code: string | null;
+  createdAt: string | null;
+  paymentMethod: string | null;
+  paymentStatus?: string | null;
+  fulfillment?: string | null;
+  total: number;
+  tableNumber?: string | null;
+  customer?: { name: string | null; phone: string | null } | null;
+  items: BillItem[];
+};
+
 export const api = {
   // --- Menu & bàn ---
   getMenu: () => request<Menu>('/menu'),
@@ -363,4 +384,8 @@ export const api = {
   ) => request<FruitProduct>(`/fruits/${id}`, { method: 'PATCH', body }),
   deleteFruit: (id: string) =>
     request<{ ok: boolean; id: string }>(`/fruits/${id}`, { method: 'DELETE' }),
+
+  // --- Lịch sử bill (quầy + bàn + app) ---
+  listBills: (limit = 200) =>
+    request<Bill[]>(`/bills?limit=${limit}`),
 };
