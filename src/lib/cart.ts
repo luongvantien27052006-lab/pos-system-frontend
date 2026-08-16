@@ -22,13 +22,32 @@ export function cartKey(
   return `${productId}|${ids}|${note ?? ''}`;
 }
 
+const SIZE_GROUP = 'Kích cỡ';
+
+/** Option là SIZE (trái cây chấm muối)? Size THAY giá gốc thay vì cộng. */
+export function isSizeOption(o: MenuOption): boolean {
+  return o.groupName === SIZE_GROUP;
+}
+/** Món có size (trái cây)? */
+export function hasSizeOptions(product: MenuProduct): boolean {
+  return product.options.some(isSizeOption);
+}
+
 export function makeCartItem(
   product: MenuProduct,
   quantity: number,
   options: MenuOption[],
   note?: string,
 ): CartItem {
-  const unitPrice = product.price + options.reduce((s, o) => s + o.price, 0);
+  const size = options.find(isSizeOption);
+  const extras = options
+    .filter((o) => !isSizeOption(o))
+    .reduce((s, o) => s + o.price, 0);
+  // Trái cây: giá = giá size đã chọn (THAY) + topping ngoài size.
+  // Món khác: giá món + tổng topping (cộng dồn như cũ).
+  const unitPrice = size
+    ? size.price + extras
+    : product.price + options.reduce((s, o) => s + o.price, 0);
   return {
     key: cartKey(product.id, options, note),
     product,
