@@ -45,6 +45,11 @@ const STATUS_META: Record<
   READY: {
     label: 'Sẵn sàng',
     cls: 'bg-success/20 text-success-foreground',
+    next: { status: 'DELIVERING', label: 'Giao hàng' },
+  },
+  DELIVERING: {
+    label: 'Đang giao',
+    cls: 'bg-primary/15 text-primary',
     next: { status: 'DELIVERED', label: 'Đã giao' },
   },
   DELIVERED: { label: 'Đã giao', cls: 'bg-muted text-muted-foreground' },

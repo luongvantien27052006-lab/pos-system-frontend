@@ -200,6 +200,7 @@ export type PrepStatus =
   | 'CONFIRMED'
   | 'IN_PROGRESS'
   | 'READY'
+  | 'DELIVERING'
   | 'DELIVERED'
   | 'CANCELLED';
 export type AppFulfillment = 'DELIVERY' | 'PICKUP';
