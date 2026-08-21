@@ -45,12 +45,18 @@ export function BillsAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>('ALL');
+  const [mode, setMode] = useState<'day' | 'month'>('day');
+  const vnNow = new Date(Date.now() + 7 * 3600 * 1000).toISOString();
+  const [day, setDay] = useState(() => vnNow.slice(0, 10));
+  const [month, setMonth] = useState(() => vnNow.slice(0, 7));
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      setBills(await api.listBills(300));
+      setBills(
+        await api.listBills(300, mode === 'day' ? { date: day } : { month }),
+      );
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Không tải được lịch sử bill');
     } finally {
@@ -60,7 +66,8 @@ export function BillsAdmin() {
 
   useEffect(() => {
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, day, month]);
 
   const shown = useMemo(
     () => (filter === 'ALL' ? bills : bills.filter((b) => b.source === filter)),
@@ -84,6 +91,49 @@ export function BillsAdmin() {
         <Button size="sm" variant="secondary" onClick={load}>
           <RefreshCw className="h-4 w-4" /> Tải lại
         </Button>
+      </div>
+
+      {/* Bộ lọc theo ngày/tháng */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="flex rounded-lg border p-0.5">
+          <button
+            onClick={() => setMode('day')}
+            className={cn(
+              'rounded-md px-3 py-1 text-sm font-semibold transition',
+              mode === 'day'
+                ? 'bg-accent text-accent-foreground'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            Theo ngày
+          </button>
+          <button
+            onClick={() => setMode('month')}
+            className={cn(
+              'rounded-md px-3 py-1 text-sm font-semibold transition',
+              mode === 'month'
+                ? 'bg-accent text-accent-foreground'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            Theo tháng
+          </button>
+        </div>
+        {mode === 'day' ? (
+          <input
+            type="date"
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+            className="rounded-lg border bg-background px-3 py-1.5 text-sm"
+          />
+        ) : (
+          <input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="rounded-lg border bg-background px-3 py-1.5 text-sm"
+          />
+        )}
       </div>
 
       {/* Bộ lọc nguồn */}
@@ -145,6 +195,25 @@ export function BillsAdmin() {
                     {b.paymentMethod ? ` · ${b.paymentMethod}` : ''}
                     {b.paymentStatus === 'PAID' ? ' · Đã trả' : ''}
                     {b.paymentStatus === 'PENDING' ? ' · Chưa trả' : ''}
+                    {b.source === 'APP' && b.prepStatus ? (
+                      <span
+                        className={cn(
+                          'ml-1 font-semibold',
+                          b.prepStatus === 'DELIVERED'
+                            ? 'text-emerald-600'
+                            : b.prepStatus === 'CANCELLED'
+                              ? 'text-red-600'
+                              : 'text-amber-600',
+                        )}
+                      >
+                        ·{' '}
+                        {b.prepStatus === 'DELIVERED'
+                          ? 'Giao thành công'
+                          : b.prepStatus === 'CANCELLED'
+                            ? 'Đã hủy'
+                            : 'Đang xử lý'}
+                      </span>
+                    ) : null}
                   </div>
                   {b.customer?.name && (
                     <div className="mt-0.5 text-xs text-muted-foreground">

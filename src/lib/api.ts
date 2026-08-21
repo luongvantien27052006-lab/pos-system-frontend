@@ -101,6 +101,7 @@ export type Bill = {
   createdAt: string | null;
   paymentMethod: string | null;
   paymentStatus?: string | null;
+  prepStatus?: string | null;
   fulfillment?: string | null;
   total: number;
   tableNumber?: string | null;
@@ -386,6 +387,10 @@ export const api = {
     request<{ ok: boolean; id: string }>(`/fruits/${id}`, { method: 'DELETE' }),
 
   // --- Lịch sử bill (quầy + bàn + app) ---
-  listBills: (limit = 200) =>
-    request<Bill[]>(`/bills?limit=${limit}`),
+  listBills: (limit = 200, opts?: { date?: string; month?: string }) => {
+    const p = new URLSearchParams({ limit: String(limit) });
+    if (opts?.date) p.set('date', opts.date);
+    if (opts?.month) p.set('month', opts.month);
+    return request<Bill[]>(`/bills?${p.toString()}`);
+  },
 };
