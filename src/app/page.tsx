@@ -32,6 +32,12 @@ const surfaces = [
     tag: 'Admin',
   },
   {
+    href: '/admin/bills',
+    title: 'Lịch sử đơn',
+    desc: 'Từng đơn app & tại quầy, lọc theo ngày/tháng',
+    tag: 'Admin',
+  },
+  {
     href: '/admin/products',
     title: 'Quản lý món',
     desc: 'Thêm món, upload ảnh, ngừng bán',
