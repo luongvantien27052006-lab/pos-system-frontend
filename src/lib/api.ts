@@ -393,4 +393,24 @@ export const api = {
     if (opts?.month) p.set('month', opts.month);
     return request<Bill[]>(`/bills?${p.toString()}`);
   },
+
+  // --- Đánh giá món (App đẩy sang) ---
+  reviewsSummary: () =>
+    request<{
+      total: number;
+      avgStars: number;
+      perProduct: {
+        productId: string;
+        productName: string | null;
+        avgStars: number;
+        count: number;
+      }[];
+      recent: {
+        productId: string;
+        productName: string | null;
+        stars: number;
+        comment: string | null;
+        createdAt: string;
+      }[];
+    }>('/reviews/summary'),
 };

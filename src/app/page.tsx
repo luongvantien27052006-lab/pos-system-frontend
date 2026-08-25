@@ -38,6 +38,12 @@ const surfaces = [
     tag: 'Admin',
   },
   {
+    href: '/admin/reviews',
+    title: 'Đánh giá món',
+    desc: 'Sao & nhận xét khách gửi từ app',
+    tag: 'Admin',
+  },
+  {
     href: '/admin/products',
     title: 'Quản lý món',
     desc: 'Thêm món, upload ảnh, ngừng bán',
