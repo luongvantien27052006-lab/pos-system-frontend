@@ -123,7 +123,7 @@ export function AnalyticsAdmin() {
                   {data.revenueTrend.map((r, i) => (
                     <div
                       key={i}
-                      className="group flex flex-1 flex-col items-center justify-end"
+                      className="group flex h-full flex-1 flex-col items-center justify-end"
                       title={`${r.date}: ${money(r.revenue)} · ${r.orders} đơn`}
                     >
                       <div
@@ -155,7 +155,7 @@ export function AnalyticsAdmin() {
                 return (
                   <div
                     key={h}
-                    className="flex flex-1 flex-col items-center justify-end"
+                    className="flex h-full flex-1 flex-col items-center justify-end"
                     title={`${h}h: ${v} đơn`}
                   >
                     <div
