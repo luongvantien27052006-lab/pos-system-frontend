@@ -394,23 +394,15 @@ export const api = {
     return request<Bill[]>(`/bills?${p.toString()}`);
   },
 
-  // --- Đánh giá món (App đẩy sang) ---
-  reviewsSummary: () =>
+  // --- Thống kê nâng cao ---
+  analyticsSummary: (days = 30) =>
     request<{
-      total: number;
-      avgStars: number;
-      perProduct: {
-        productId: string;
-        productName: string | null;
-        avgStars: number;
-        count: number;
-      }[];
-      recent: {
-        productId: string;
-        productName: string | null;
-        stars: number;
-        comment: string | null;
-        createdAt: string;
-      }[];
-    }>('/reviews/summary'),
+      days: number;
+      totalRevenue: number;
+      totalOrders: number;
+      avgOrder: number;
+      revenueTrend: { date: string; revenue: number; orders: number }[];
+      peakHours: { hour: number; orders: number }[];
+      bestSellers: { name: string; qty: number }[];
+    }>(`/analytics/summary?days=${days}`),
 };
