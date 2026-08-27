@@ -144,11 +144,16 @@ export function VouchersAdmin() {
               <select className={inputClass} value={type} onChange={(e) => setType(e.target.value)}>
                 <option value="PERCENTAGE">Giảm %</option>
                 <option value="FIXED_AMOUNT">Giảm tiền</option>
+                <option value="SHIPPING">Giảm phí ship</option>
               </select>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">
-                {type === 'PERCENTAGE' ? 'Giảm (%)' : 'Giảm (đ)'}
+                {type === 'PERCENTAGE'
+                  ? 'Giảm (%)'
+                  : type === 'SHIPPING'
+                    ? 'Giảm phí ship (đ)'
+                    : 'Giảm (đ)'}
               </label>
               <input className={inputClass} type="number" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} />
             </div>
@@ -213,6 +218,7 @@ export function VouchersAdmin() {
             <div className="space-y-3">
               {items.map((v) => {
                 const isPct = v.type === 'PERCENTAGE';
+                const isShip = v.type === 'SHIPPING';
                 const disc = Number(v.discount_value);
                 return (
                   <div key={v.id} className={cn('flex gap-3 rounded-xl border bg-card p-3', v.status !== 'ACTIVE' && 'opacity-60')}>
@@ -222,7 +228,12 @@ export function VouchersAdmin() {
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold">{v.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        Mã <b>{v.code}</b> · {isPct ? `Giảm ${disc}%` : `Giảm ${fmtVnd(disc)}`}
+                        Mã <b>{v.code}</b> ·{' '}
+                        {isPct
+                          ? `Giảm ${disc}%`
+                          : isShip
+                            ? `Giảm phí ship ${fmtVnd(disc)}`
+                            : `Giảm ${fmtVnd(disc)}`}
                         {isPct && Number(v.max_discount_amount) > 0
                           ? ` (tối đa ${fmtVnd(Number(v.max_discount_amount))})`
                           : ''}
