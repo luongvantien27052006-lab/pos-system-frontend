@@ -45,6 +45,7 @@ export function VouchersAdmin() {
   const [maxDiscountAmount, setMaxDiscountAmount] = useState('');
   const [totalUsageLimit, setTotalUsageLimit] = useState('');
   const [perUserLimit, setPerUserLimit] = useState('1');
+  const [isPublic, setIsPublic] = useState(true);
   const [startDate, setStartDate] = useState(plusDaysLocal(0));
   const [endDate, setEndDate] = useState(plusDaysLocal(30));
 
@@ -65,6 +66,7 @@ export function VouchersAdmin() {
     setCode('');
     setName('');
     setType('PERCENTAGE');
+    setIsPublic(true);
     setDiscountValue('20');
     setMinOrderValue('0');
     setMaxDiscountAmount('');
@@ -96,6 +98,7 @@ export function VouchersAdmin() {
         perUserLimit: Number(perUserLimit) || 1,
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
+        isPublic,
       });
       setToast({ type: 'success', message: 'Đã tạo voucher' });
       reset();
@@ -188,6 +191,23 @@ export function VouchersAdmin() {
               <label className="mb-1 block text-sm font-medium">Giới hạn/người</label>
               <input className={inputClass} type="number" value={perUserLimit} onChange={(e) => setPerUserLimit(e.target.value)} />
             </div>
+          </div>
+          <div className="rounded-lg border p-3">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4"
+                checked={!isPublic}
+                onChange={(e) => setIsPublic(!e.target.checked)}
+              />
+              <span className="text-sm">
+                <b>Voucher riêng (chỉ người được tặng)</b>
+                <span className="block text-xs text-muted-foreground">
+                  Bật = chỉ tài khoản được cấp vào ví mới dùng được (VD người mới, sinh nhật).
+                  Tắt = ai có mã cũng dùng (mã công khai).
+                </span>
+              </span>
+            </label>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium">Bắt đầu</label>
