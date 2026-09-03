@@ -228,6 +228,7 @@ export interface AppOrder {
   prepStatus: PrepStatus;
   note: string | null;
   receivedAt: string;
+  scheduledFor: string | null;
 }
 
 // ===== Sự kiện Socket.io (server -> client), khớp realtime.events.ts =====

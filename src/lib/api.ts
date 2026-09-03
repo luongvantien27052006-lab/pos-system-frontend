@@ -373,6 +373,9 @@ export const api = {
     price: number;
     displayOrder?: number;
     isAvailable?: boolean;
+    calories?: number;
+    healthTags?: string[];
+    isSeasonal?: boolean;
     options: FruitOption[];
   }) => request<FruitProduct>('/fruits', { method: 'POST', body }),
   updateFruit: (
@@ -382,6 +385,9 @@ export const api = {
       price: number;
       isAvailable: boolean;
       options: FruitOption[];
+      calories: number;
+      healthTags: string[];
+      isSeasonal: boolean;
     }>,
   ) => request<FruitProduct>(`/fruits/${id}`, { method: 'PATCH', body }),
   deleteFruit: (id: string) =>

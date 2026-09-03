@@ -266,6 +266,18 @@ export function OnlineOrders() {
                 </span>
               </div>
 
+              {o.scheduledFor && (
+                <div className="mt-2 rounded-lg bg-amber-100 px-2.5 py-1.5 text-sm font-bold text-amber-800">
+                  ⏰ Hẹn giờ:{' '}
+                  {new Date(o.scheduledFor).toLocaleString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    day: '2-digit',
+                    month: '2-digit',
+                  })}
+                </div>
+              )}
+
               <div className="mt-1 text-sm">
                 <p className="font-semibold">{o.customerName ?? 'Khách'}</p>
                 {o.customerPhone && (

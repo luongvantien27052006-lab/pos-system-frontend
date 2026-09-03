@@ -50,6 +50,9 @@ export function FruitsAdmin() {
   const [priceS, setPriceS] = useState('');
   const [priceM, setPriceM] = useState('');
   const [priceL, setPriceL] = useState('');
+  const [calories, setCalories] = useState('');
+  const [healthTags, setHealthTags] = useState('');
+  const [isSeasonal, setIsSeasonal] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const loadProducts = useCallback(async () => {
@@ -76,6 +79,9 @@ export function FruitsAdmin() {
     setPriceS('');
     setPriceM('');
     setPriceL('');
+    setCalories('');
+    setHealthTags('');
+    setIsSeasonal(false);
   };
 
   const startEdit = (p: FruitProduct) => {
@@ -84,6 +90,17 @@ export function FruitsAdmin() {
     setPriceS(String(sizePrice(p, 'size_s') || p.price || ''));
     setPriceM(String(sizePrice(p, 'size_m') || ''));
     setPriceL(String(sizePrice(p, 'size_l') || ''));
+    setCalories(String((p as { calories?: number }).calories ?? ''));
+    const tags =
+      (p as { health_tags?: string[]; healthTags?: string[] }).health_tags ??
+      (p as { healthTags?: string[] }).healthTags;
+    setHealthTags(Array.isArray(tags) ? tags.join(', ') : '');
+    setIsSeasonal(
+      Boolean(
+        (p as { is_seasonal?: boolean; isSeasonal?: boolean }).is_seasonal ??
+          (p as { isSeasonal?: boolean }).isSeasonal,
+      ),
+    );
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -106,7 +123,14 @@ export function FruitsAdmin() {
     try {
       const options = buildSizeOptions(s, m, l);
       if (editingId) {
-        await api.updateFruit(editingId, { name: name.trim(), price: s, options });
+        await api.updateFruit(editingId, {
+          name: name.trim(),
+          price: s,
+          options,
+          calories: Number(calories) || undefined,
+          healthTags: healthTags.split(',').map((t) => t.trim()).filter(Boolean),
+          isSeasonal,
+        });
         setToast({ type: 'success', message: 'Đã cập nhật món' });
       } else {
         await api.createFruit({
@@ -116,6 +140,9 @@ export function FruitsAdmin() {
           displayOrder: 100,
           isAvailable: true,
           options,
+          calories: Number(calories) || undefined,
+          healthTags: healthTags.split(',').map((t) => t.trim()).filter(Boolean),
+          isSeasonal,
         });
         setToast({ type: 'success', message: 'Đã thêm món' });
       }
@@ -192,6 +219,36 @@ export function FruitsAdmin() {
         <p className="mt-2 text-[11px] text-muted-foreground">
           Nhập giá theo <b>đồng</b> (ví dụ 180.000đ → gõ <b>180000</b>). Giá hiển thị mặc định trên app là giá size S.
         </p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <label className="block text-xs font-medium text-muted-foreground">
+            Calo (kcal)
+            <input
+              type="number"
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+              placeholder="VD 120"
+            />
+          </label>
+          <label className="block text-xs font-medium text-muted-foreground">
+            Nhãn sức khỏe (cách nhau dấu phẩy)
+            <input
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+              value={healthTags}
+              onChange={(e) => setHealthTags(e.target.value)}
+              placeholder="Detox, Ít đường"
+            />
+          </label>
+        </div>
+        <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            checked={isSeasonal}
+            onChange={(e) => setIsSeasonal(e.target.checked)}
+          />
+          <span>Trái cây theo mùa (hiện ở mục gợi ý trên app)</span>
+        </label>
         <div className="mt-3 flex items-center gap-2">
           <Button size="sm" variant="primary" disabled={saving} onClick={submit}>
             {saving ? (
