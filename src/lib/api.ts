@@ -89,6 +89,15 @@ export type FruitProduct = {
 };
 
 // Bill lịch sử bán hàng (quầy + bàn + app).
+export type CashReconcile = {
+  id: number;
+  date: string;
+  expected: number;
+  counted: number;
+  difference: number;
+  note: string | null;
+  createdAt: string;
+};
 export type BillTopping = { name: string; unitPrice: number };
 export type BillItem = {
   name: string;
@@ -195,6 +204,21 @@ export const api = {
   getTodayRevenue: () => request<RevenueSummary>('/dashboard/revenue/today'),
   getMonthlyRevenue: () =>
     request<MonthlyRevenue>('/dashboard/revenue/month'),
+  getRevenueCompare: () =>
+    request<{
+      today: number;
+      yesterday: number;
+      thisMonth: number;
+      lastMonth: number;
+    }>('/dashboard/revenue/compare'),
+  getCashExpected: (date?: string) =>
+    request<{ date: string; expected: number }>(
+      `/dashboard/cash${date ? `?date=${encodeURIComponent(date)}` : ''}`,
+    ),
+  saveCashReconcile: (body: { date?: string; counted: number; note?: string }) =>
+    request<CashReconcile>('/dashboard/cash', { method: 'POST', body }),
+  getCashHistory: () =>
+    request<CashReconcile[]>('/dashboard/cash/history'),
 
   // --- Quản trị sản phẩm ---
   listProducts: () => request<AdminProduct[]>('/products'),

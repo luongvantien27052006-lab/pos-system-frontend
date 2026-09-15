@@ -11,6 +11,7 @@
 
 import Link from 'next/link';
 import { cookies } from 'next/headers';
+import { LogoutButton } from '@/components/logout-button';
 
 const surfaces = [
   {
@@ -27,20 +28,14 @@ const surfaces = [
   },
   {
     href: '/dashboard',
-    title: 'Doanh thu',
-    desc: 'Theo dõi tiền về theo thời gian thực',
+    title: 'Doanh thu & Đơn hàng',
+    desc: 'Tiền về realtime · so sánh nhanh · lịch sử đơn · chốt sổ tiền mặt',
     tag: 'Admin',
   },
   {
     href: '/admin/analytics',
     title: 'Thống kê',
     desc: 'Món bán chạy, giờ cao điểm, xu hướng doanh thu',
-    tag: 'Admin',
-  },
-  {
-    href: '/admin/bills',
-    title: 'Lịch sử đơn',
-    desc: 'Từng đơn app & tại quầy, lọc theo ngày/tháng',
     tag: 'Admin',
   },
   {
@@ -85,16 +80,19 @@ export default function HomePage() {
     : surfaces.filter((s) => staffPaths.some((p) => s.href.startsWith(p)));
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-8 px-6 py-16">
-      <header className="space-y-2">
-        <span className="text-sm font-semibold uppercase tracking-widest text-accent">
-          POS Cà phê
-        </span>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Chọn màn hình bắt đầu
-        </h1>
-        <p className="text-muted-foreground">
-          Hệ thống order &amp; thanh toán thời gian thực.
-        </p>
+      <header className="flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <span className="text-sm font-semibold uppercase tracking-widest text-accent">
+            POS Cà phê
+          </span>
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Chọn màn hình bắt đầu
+          </h1>
+          <p className="text-muted-foreground">
+            Hệ thống order &amp; thanh toán thời gian thực.
+          </p>
+        </div>
+        <LogoutButton />
       </header>
 
       <div className="grid gap-3">

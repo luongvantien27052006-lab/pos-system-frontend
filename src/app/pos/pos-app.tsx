@@ -17,6 +17,7 @@ import { MenuPanel } from '@/components/pos/menu-panel';
 import { OnlineOrders } from '@/components/pos/online-orders';
 import { OrderPanel } from '@/components/pos/order-panel';
 import { ToppingSheet } from '@/components/customer/topping-sheet';
+import { BackButton } from '@/components/ui/back-button';
 
 export function PosApp() {
   const [menu, setMenu] = useState<Menu | null>(null);
@@ -98,6 +99,9 @@ export function PosApp() {
 
   return (
     <div className="flex h-dvh flex-col">
+      <div className="flex items-center border-b bg-card px-3 py-1.5">
+        <BackButton label="Trang chủ" href="/" />
+      </div>
       <PrinterAlert />
       <CashAlerts initial={alerts} />
       <OnlineOrders />

@@ -40,7 +40,9 @@ const SOURCE_STYLE: Record<Bill['source'], string> = {
 
 type Filter = 'ALL' | Bill['source'];
 
-export function BillsAdmin() {
+export function BillsAdmin({
+  embedded = false,
+}: { embedded?: boolean } = {}) {
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export function BillsAdmin() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-8">
+    <div className={embedded ? '' : 'mx-auto max-w-3xl px-5 py-8'}>
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Lịch sử bill</h1>
@@ -266,6 +268,6 @@ export function BillsAdmin() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
