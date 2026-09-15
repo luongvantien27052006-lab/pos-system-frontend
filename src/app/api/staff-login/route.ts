@@ -21,7 +21,10 @@ export async function POST(req: Request) {
     );
   }
   const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    process.env.POS_BACKEND_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    'http://localhost:4000/api';
+  const secret = process.env.POS_PROXY_SECRET;
 
   let body: { pin?: string } = {};
   try {
@@ -37,7 +40,10 @@ export async function POST(req: Request) {
   try {
     const r = await fetch(`${apiUrl}/staff/verify`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(secret ? { 'x-pos-secret': secret } : {}),
+      },
       body: JSON.stringify({ pin: body.pin }),
       cache: 'no-store',
     });
