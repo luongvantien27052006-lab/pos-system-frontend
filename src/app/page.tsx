@@ -45,8 +45,8 @@ const surfaces = [
   },
   {
     href: '/admin/products',
-    title: 'Quản lý món',
-    desc: 'Thêm món, upload ảnh, ngừng bán',
+    title: 'Quản lý món & topping',
+    desc: 'Thêm món, trái cây (đồng bộ app), topping & gán topping',
     tag: 'Admin',
   },
   {
@@ -59,12 +59,6 @@ const surfaces = [
     href: '/admin/news',
     title: 'Quản lý tin tức',
     desc: 'Đăng tin, thông báo cửa hàng cho khách',
-    tag: 'Admin',
-  },
-  {
-    href: '/admin/toppings',
-    title: 'Quản lý topping',
-    desc: 'Tạo topping, gán cho từng món',
     tag: 'Admin',
   },
   {

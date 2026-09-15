@@ -14,6 +14,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Loader2, Plus, Pencil, Trash2, Save, X, RefreshCw } from 'lucide-react';
 import { api, ApiError, type FruitProduct, type FruitOption } from '@/lib/api';
+import type { AdminOption } from '@/types';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Toast, type ToastState } from '@/components/ui/toast';
 
@@ -55,6 +57,10 @@ export function FruitsAdmin() {
   const [isSeasonal, setIsSeasonal] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Topping cho món trái cây (đồng bộ lên app cùng options, KHÔNG đụng size).
+  const [toppings, setToppings] = useState<AdminOption[]>([]);
+  const [selTopping, setSelTopping] = useState<Set<number>>(new Set());
+
   const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
@@ -73,6 +79,22 @@ export function FruitsAdmin() {
     loadProducts();
   }, [loadProducts]);
 
+  // Tải danh sách topping POS đang hoạt động (để gán cho món trái cây).
+  useEffect(() => {
+    api
+      .listOptions()
+      .then((os) => setToppings(os.filter((o) => o.isActive)))
+      .catch(() => undefined);
+  }, []);
+
+  const toggleTopping = (id: number) =>
+    setSelTopping((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
   const resetForm = () => {
     setEditingId(null);
     setName('');
@@ -82,6 +104,7 @@ export function FruitsAdmin() {
     setCalories('');
     setHealthTags('');
     setIsSeasonal(false);
+    setSelTopping(new Set());
   };
 
   const startEdit = (p: FruitProduct) => {
@@ -101,6 +124,15 @@ export function FruitsAdmin() {
           (p as { isSeasonal?: boolean }).isSeasonal,
       ),
     );
+    // Chọn sẵn topping đã gắn cho món (option id dạng 'topping_<id>').
+    const picked = (p.options ?? [])
+      .filter((o) => o.groupName !== SIZE_GROUP)
+      .map((o) => {
+        const mt = /^topping_(\d+)$/.exec(String(o.id));
+        return mt ? Number(mt[1]) : null;
+      })
+      .filter((x): x is number => x !== null);
+    setSelTopping(new Set(picked));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -121,7 +153,15 @@ export function FruitsAdmin() {
     }
     setSaving(true);
     try {
-      const options = buildSizeOptions(s, m, l);
+      const toppingOptions: FruitOption[] = toppings
+        .filter((t) => selTopping.has(t.id))
+        .map((t) => ({
+          id: `topping_${t.id}`,
+          name: t.name,
+          price: t.price,
+          groupName: t.groupName || 'Topping',
+        }));
+      const options = [...buildSizeOptions(s, m, l), ...toppingOptions];
       if (editingId) {
         await api.updateFruit(editingId, {
           name: name.trim(),
@@ -249,6 +289,40 @@ export function FruitsAdmin() {
           />
           <span>Trái cây theo mùa (hiện ở mục gợi ý trên app)</span>
         </label>
+
+        {toppings.length > 0 && (
+          <div className="mt-4">
+            <p className="mb-1 text-xs font-medium text-muted-foreground">
+              Topping cho món (tuỳ chọn) — cộng thêm giá, KHÔNG ảnh hưởng size
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {toppings.map((t) => {
+                const on = selTopping.has(t.id);
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => toggleTopping(t.id)}
+                    className={cn(
+                      'rounded-xl border-2 px-3 py-2 text-left text-sm transition',
+                      on
+                        ? 'border-accent bg-accent/10'
+                        : 'border-border text-muted-foreground',
+                    )}
+                  >
+                    <span className="block font-medium text-foreground">
+                      {t.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {money(t.price)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="mt-3 flex items-center gap-2">
           <Button size="sm" variant="primary" disabled={saving} onClick={submit}>
             {saving ? (

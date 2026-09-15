@@ -11,12 +11,13 @@ import type { AdminProduct, MenuCategory } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Toast, type ToastState } from '@/components/ui/toast';
 import { FruitsAdmin } from '../fruits/fruits-admin';
+import { ToppingsAdmin } from '../toppings/toppings-admin';
 
 const inputClass =
   'w-full rounded-xl border bg-background px-3 py-2 outline-none transition focus:border-accent';
 
 export function ProductsAdmin() {
-  const [tab, setTab] = useState<'pos' | 'fruit'>('pos');
+  const [tab, setTab] = useState<'pos' | 'fruit' | 'topping'>('pos');
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [editing, setEditing] = useState<AdminProduct | null>(null);
@@ -154,7 +155,7 @@ export function ProductsAdmin() {
         >
           <ArrowLeft className="h-4 w-4" /> Trang chủ
         </Link>
-        <h1 className="text-2xl font-bold">Quản lý món</h1>
+        <h1 className="text-2xl font-bold">Quản lý món & topping</h1>
       </header>
 
       {/* Tab: Món POS | Trái cây (đồng bộ app) */}
@@ -183,9 +184,22 @@ export function ProductsAdmin() {
         >
           Trái cây (đồng bộ app)
         </button>
+        <button
+          type="button"
+          onClick={() => setTab('topping')}
+          className={cn(
+            'px-4 py-2 text-sm font-semibold transition',
+            tab === 'topping'
+              ? 'border-b-2 border-accent text-foreground'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          Topping
+        </button>
       </div>
 
       {tab === 'fruit' && <FruitsAdmin />}
+      {tab === 'topping' && <ToppingsAdmin embedded />}
 
       {tab === 'pos' && (
       <div className="grid gap-8 lg:grid-cols-[380px_1fr]">

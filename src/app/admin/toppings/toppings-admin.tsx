@@ -34,7 +34,9 @@ const inputClass =
 // NEW: pham vi gan topping
 type AssignScope = 'product' | 'category' | 'all';
 
-export function ToppingsAdmin() {
+export function ToppingsAdmin({
+  embedded = false,
+}: { embedded?: boolean } = {}) {
   const [options, setOptions] = useState<AdminOption[]>([]);
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -288,15 +290,19 @@ export function ToppingsAdmin() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-8">
-      <Link
-        href="/"
-        className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" /> Về trang chủ
-      </Link>
+    <div className={cn(!embedded && 'mx-auto max-w-3xl px-5 py-8')}>
+      {!embedded && (
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" /> Về trang chủ
+        </Link>
+      )}
 
-      <h1 className="mb-1 text-2xl font-bold">Quản lý Topping</h1>
+      {!embedded && (
+        <h1 className="mb-1 text-2xl font-bold">Quản lý Topping</h1>
+      )}
       <p className="mb-6 text-sm text-muted-foreground">
         Tạo topping/tùy chọn và gán cho từng món. Topping sẽ hiện ở menu khi
         khách đặt.
@@ -622,6 +628,6 @@ export function ToppingsAdmin() {
       )}
 
       <Toast toast={toast} onClose={() => setToast(null)} />
-    </main>
+    </div>
   );
 }
