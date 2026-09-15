@@ -149,6 +149,16 @@ export const api = {
       `/app-orders/${encodeURIComponent(appOrderId)}/payment`,
       { method: 'PATCH' },
     ),
+  /** Nhân viên báo khách không nhận / từ chối (đơn COD quay về). */
+  reportAppOrderNoShow: (
+    appOrderId: string,
+    reason: 'UNREACHABLE' | 'REFUSED',
+    note?: string,
+  ) =>
+    request<{ ok: boolean; applied: boolean }>(
+      `/app-orders/${encodeURIComponent(appOrderId)}/no-show`,
+      { method: 'POST', body: { reason, note } },
+    ),
 
   // --- Giờ mở/đóng cửa ---
   getStoreHours: () => request<StoreHours>('/store/hours'),

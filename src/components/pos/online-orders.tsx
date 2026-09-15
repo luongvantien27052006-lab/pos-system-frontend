@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Banknote,
   Bike,
+  Camera,
   Check,
+  PhoneOff,
   ShoppingBag,
   X,
   XCircle,
@@ -99,6 +101,11 @@ export function OnlineOrders() {
   const [orders, setOrders] = useState<AppOrder[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState>(null);
+  // Dialog "khách không nhận đơn" (đối soát POS <-> App).
+  const [noShow, setNoShow] = useState<AppOrder | null>(null);
+  const [noShowReason, setNoShowReason] =
+    useState<'UNREACHABLE' | 'REFUSED'>('UNREACHABLE');
+  const [noShowNote, setNoShowNote] = useState('');
 
   /** Tải lại nhưng GIỮ các thẻ "đã hủy" đang chờ thu ngân bấm "Đã xem". */
   const refetch = useCallback(async () => {
@@ -211,6 +218,38 @@ export function OnlineOrders() {
       // Đã giao + đã thu -> xong, gỡ thẻ.
       setOrders((prev) => prev.filter((x) => x.appOrderId !== o.appOrderId));
       setToast({ type: 'success', message: `Đã thu tiền đơn ${o.orderCode}` });
+    } catch (e) {
+      setToast({
+        type: 'error',
+        message: e instanceof Error ? e.message : 'Không ghi nhận được',
+      });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const openNoShow = (o: AppOrder) => {
+    setNoShowReason('UNREACHABLE');
+    setNoShowNote('');
+    setNoShow(o);
+  };
+
+  const submitNoShow = async () => {
+    if (!noShow) return;
+    const o = noShow;
+    setBusy(o.appOrderId);
+    try {
+      await api.reportAppOrderNoShow(
+        o.appOrderId,
+        noShowReason,
+        noShowNote.trim() || undefined,
+      );
+      setOrders((prev) => prev.filter((x) => x.appOrderId !== o.appOrderId));
+      setNoShow(null);
+      setToast({
+        type: 'success',
+        message: `Đã ghi nhận đơn ${o.orderCode} quay về`,
+      });
     } catch (e) {
       setToast({
         type: 'error',
@@ -370,6 +409,18 @@ export function OnlineOrders() {
                         <Check className="h-4 w-4" /> {meta.next.label}
                       </Button>
                     )}
+                    {o.paymentMethod === 'COD' &&
+                      o.fulfillment === 'DELIVERY' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={busy === o.appOrderId}
+                          onClick={() => openNoShow(o)}
+                          title="Khách không nhận / từ chối"
+                        >
+                          <PhoneOff className="h-4 w-4" />
+                        </Button>
+                      )}
                     <Button
                       size="sm"
                       variant="outline"
@@ -386,6 +437,85 @@ export function OnlineOrders() {
           );
         })}
       </div>
+      {noShow && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setNoShow(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-card p-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-base font-extrabold">
+              Đơn {noShow.orderCode} quay về?
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {noShow.customerName ?? 'Khách'}
+              {noShow.customerPhone ? ` · ${noShow.customerPhone}` : ''}
+            </p>
+
+            <div className="mt-3 flex items-start gap-2 rounded-xl bg-amber-100 p-3 text-sm font-semibold text-amber-900">
+              <Camera className="mt-0.5 h-5 w-5 shrink-0" />
+              <span>
+                Nhớ CHỤP LẠI ẢNH đơn hàng đã quay về (giữ làm bằng chứng) trước
+                khi xác nhận.
+              </span>
+            </div>
+
+            <div className="mt-3 space-y-2">
+              <p className="text-xs font-bold text-muted-foreground">Lý do</p>
+              <label className="flex items-center gap-2 rounded-lg border border-border p-2 text-sm">
+                <input
+                  type="radio"
+                  name="nsr"
+                  checked={noShowReason === 'UNREACHABLE'}
+                  onChange={() => setNoShowReason('UNREACHABLE')}
+                />
+                Không liên hệ được khách
+              </label>
+              <label className="flex items-center gap-2 rounded-lg border border-border p-2 text-sm">
+                <input
+                  type="radio"
+                  name="nsr"
+                  checked={noShowReason === 'REFUSED'}
+                  onChange={() => setNoShowReason('REFUSED')}
+                />
+                Khách từ chối nhận đơn
+              </label>
+            </div>
+
+            <textarea
+              value={noShowNote}
+              onChange={(e) => setNoShowNote(e.target.value)}
+              placeholder="Ghi chú (tuỳ chọn)…"
+              rows={2}
+              className="mt-3 w-full rounded-lg border border-border p-2 text-sm"
+            />
+
+            <div className="mt-4 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1"
+                onClick={() => setNoShow(null)}
+                disabled={busy === noShow.appOrderId}
+              >
+                Huỷ
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 border-destructive text-destructive hover:bg-destructive/10"
+                onClick={() => void submitNoShow()}
+                disabled={busy === noShow.appOrderId}
+              >
+                Xác nhận đơn quay về
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Toast toast={toast} onClose={() => setToast(null)} />
     </section>
   );
