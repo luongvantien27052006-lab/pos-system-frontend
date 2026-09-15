@@ -28,8 +28,9 @@ import type {
   VoucherItem,
 } from '@/types';
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? 'https://localhost:4000/api';
+// Mọi lời gọi đi qua proxy Next.js (/api/pos/...) — proxy tự thêm secret +
+// kiểm cookie cho route admin. Backend không nhận gọi thẳng nữa (PosSecretGuard).
+const BASE_URL = '/api/pos';
 
 export class ApiError extends Error {
   constructor(
