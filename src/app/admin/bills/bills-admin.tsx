@@ -7,7 +7,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, Printer, RefreshCw } from 'lucide-react';
 import { api, ApiError, type Bill } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -51,6 +51,8 @@ export function BillsAdmin({
   const vnNow = new Date(Date.now() + 7 * 3600 * 1000).toISOString();
   const [day, setDay] = useState(() => vnNow.slice(0, 10));
   const [month, setMonth] = useState(() => vnNow.slice(0, 7));
+  const [reprinting, setReprinting] = useState<number | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -63,6 +65,25 @@ export function BillsAdmin({
       setError(e instanceof ApiError ? e.message : 'Không tải được lịch sử bill');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const reprint = async (b: Bill, idx: number) => {
+    setReprinting(idx);
+    setMsg(null);
+    try {
+      if (b.source === 'APP') {
+        if (!b.appOrderId) throw new Error('Thiếu mã đơn app');
+        await api.reprintAppOrder(b.appOrderId);
+      } else {
+        if (b.sessionId == null) throw new Error('Thiếu mã phiên');
+        await api.reprintBill(b.sessionId);
+      }
+      setMsg(`Đã in lại ${b.code ?? ''}`);
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : 'In lại thất bại');
+    } finally {
+      setReprinting(null);
     }
   };
 
@@ -156,6 +177,12 @@ export function BillsAdmin({
         ))}
       </div>
 
+      {msg && (
+        <p className="mb-3 rounded-lg bg-muted px-3 py-2 text-sm text-foreground">
+          {msg}
+        </p>
+      )}
+
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Đang tải…
@@ -228,6 +255,19 @@ export function BillsAdmin({
                   <div className="text-base font-extrabold text-accent">
                     {money(b.total)}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => reprint(b, idx)}
+                    disabled={reprinting === idx}
+                    className="mt-1 inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-60"
+                  >
+                    {reprinting === idx ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Printer className="h-3.5 w-3.5" />
+                    )}
+                    In lại
+                  </button>
                 </div>
               </div>
 

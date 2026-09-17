@@ -7,6 +7,7 @@ import {
   Camera,
   Check,
   PhoneOff,
+  Printer,
   ShoppingBag,
   X,
   XCircle,
@@ -228,6 +229,21 @@ export function OnlineOrders() {
     }
   };
 
+  const reprint = async (o: AppOrder) => {
+    setBusy(o.appOrderId);
+    try {
+      await api.reprintAppOrder(o.appOrderId);
+      setToast({ type: 'success', message: `Đã in lại đơn ${o.orderCode}` });
+    } catch (e) {
+      setToast({
+        type: 'error',
+        message: e instanceof Error ? e.message : 'In lại thất bại',
+      });
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const openNoShow = (o: AppOrder) => {
     setNoShowReason('UNREACHABLE');
     setNoShowNote('');
@@ -421,6 +437,15 @@ export function OnlineOrders() {
                           <PhoneOff className="h-4 w-4" />
                         </Button>
                       )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy === o.appOrderId}
+                      onClick={() => reprint(o)}
+                      title="In lại phiếu bếp/tem"
+                    >
+                      <Printer className="h-4 w-4" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"

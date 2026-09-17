@@ -42,12 +42,26 @@ const ADMIN_PREFIXES = [
   'reviews',
   'app-orders',
   'print',
+  'refunds',
   'tables/admin',
 ];
 
 function isAdminPath(path: string): boolean {
   return ADMIN_PREFIXES.some(
     (p) => path === p || path.startsWith(`${p}/`),
+  );
+}
+
+// Route CHỈ ADMIN (nhân viên KHÔNG được): sửa giờ mở cửa, đổi PIN.
+const ADMIN_ONLY: { path: string; methods: string[] }[] = [
+  { path: 'store/hours', methods: ['PUT', 'PATCH', 'POST'] },
+  { path: 'staff/change-pin', methods: ['POST', 'PATCH', 'PUT'] },
+];
+function isAdminOnly(path: string, method: string): boolean {
+  return ADMIN_ONLY.some(
+    (a) =>
+      (path === a.path || path.startsWith(`${a.path}/`)) &&
+      a.methods.includes(method),
   );
 }
 
@@ -59,8 +73,20 @@ async function handle(
   const path = (params?.path ?? []).join('/');
   const search = req.nextUrl.search;
 
-  // Route quản trị -> bắt buộc đăng nhập (cookie staff_session).
-  if (isAdminPath(path)) {
+  const method = req.method.toUpperCase();
+
+  // [Chỉ ADMIN] sửa giờ mở cửa / đổi PIN -> bắt buộc cookie ADMIN.
+  if (isAdminOnly(path, method)) {
+    const store = await cookies();
+    const cookie = store.get('staff_session')?.value;
+    if (!cookie || cookie !== process.env.ADMIN_SESSION_TOKEN) {
+      return NextResponse.json(
+        { message: 'Chỉ quản trị viên mới được thao tác này' },
+        { status: 403 },
+      );
+    }
+  } else if (isAdminPath(path)) {
+    // Route quản trị -> cần đăng nhập (nhân viên hoặc admin).
     const staff = process.env.STAFF_SESSION_TOKEN;
     if (staff) {
       const store = await cookies();
@@ -81,7 +107,6 @@ async function handle(
   if (ct) headers.set('content-type', ct);
   if (SECRET) headers.set('x-pos-secret', SECRET);
 
-  const method = req.method.toUpperCase();
   const hasBody = method !== 'GET' && method !== 'HEAD';
   const body = hasBody ? Buffer.from(await req.arrayBuffer()) : undefined;
 

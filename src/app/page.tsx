@@ -39,6 +39,12 @@ const surfaces = [
     tag: 'Admin',
   },
   {
+    href: '/admin/refunds',
+    title: 'Hoàn tiền',
+    desc: 'Đơn chuyển khoản đã trả bị huỷ — hoàn tiền cho khách',
+    tag: 'Admin',
+  },
+  {
     href: '/admin/products',
     title: 'Quản lý món & topping',
     desc: 'Thêm món, trái cây (đồng bộ app), topping & gán topping',

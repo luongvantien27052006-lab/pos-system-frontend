@@ -98,6 +98,17 @@ export type CashReconcile = {
   note: string | null;
   createdAt: string;
 };
+export type PendingRefund = {
+  id: string;
+  order_id: string;
+  amount: number | string;
+  bank_account: string | null;
+  bank_name: string | null;
+  account_holder: string | null;
+  created_at: string;
+  customer_phone: string | null;
+  customer_name: string | null;
+};
 export type BillTopping = { name: string; unitPrice: number };
 export type BillItem = {
   name: string;
@@ -108,6 +119,8 @@ export type BillItem = {
 export type Bill = {
   source: 'COUNTER' | 'TABLE' | 'APP';
   code: string | null;
+  sessionId?: number | null;
+  appOrderId?: string | null;
   createdAt: string | null;
   paymentMethod: string | null;
   paymentStatus?: string | null;
@@ -169,6 +182,12 @@ export const api = {
       `/app-orders/${encodeURIComponent(appOrderId)}/no-show`,
       { method: 'POST', body: { reason, note } },
     ),
+  /** In lại phiếu bếp/tem cho đơn online. */
+  reprintAppOrder: (appOrderId: string) =>
+    request<{ ok: boolean }>(
+      `/app-orders/${encodeURIComponent(appOrderId)}/reprint`,
+      { method: 'POST' },
+    ),
 
   // --- Giờ mở/đóng cửa ---
   getStoreHours: () => request<StoreHours>('/store/hours'),
@@ -219,6 +238,14 @@ export const api = {
     request<CashReconcile>('/dashboard/cash', { method: 'POST', body }),
   getCashHistory: () =>
     request<CashReconcile[]>('/dashboard/cash/history'),
+
+  // --- Hoàn tiền đơn CK đã trả bị huỷ ---
+  getPendingRefunds: () => request<PendingRefund[]>('/refunds/pending'),
+  completeRefund: (refundId: string, note?: string) =>
+    request<{ ok: boolean }>('/refunds/complete', {
+      method: 'POST',
+      body: { refundId, note },
+    }),
 
   // --- Quản trị sản phẩm ---
   listProducts: () => request<AdminProduct[]>('/products'),

@@ -236,7 +236,7 @@ function CashReconcileTab() {
   );
 }
 
-export function DashboardApp() {
+export function DashboardApp({ isAdmin = false }: { isAdmin?: boolean }) {
   const [tab, setTab] = useState<Tab>('revenue');
   const [revenue, setRevenue] = useState<RevenueSummary | null>(null);
   const [monthly, setMonthly] = useState<MonthlyRevenue | null>(null);
@@ -373,9 +373,11 @@ export function DashboardApp() {
           <div className="mt-4">
             <MonthlyRevenueCard data={monthly} />
           </div>
-          <div className="mt-4">
-            <StoreHoursCard />
-          </div>
+          {isAdmin && (
+            <div className="mt-4">
+              <StoreHoursCard />
+            </div>
+          )}
         </div>
       )}
 
