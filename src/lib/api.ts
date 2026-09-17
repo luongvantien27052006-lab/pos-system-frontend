@@ -101,11 +101,31 @@ export type CashReconcile = {
 export type PendingRefund = {
   id: string;
   order_id: string;
+  user_id: string;
   amount: number | string;
+  requested_by: string | null;
+  bank_account: string | null;
+  bank_name: string | null;
+  bank_code: string | null;
+  account_holder: string | null;
+  requested_at: string;
+  order_created_at: string | null;
+  customer_phone: string | null;
+  customer_name: string | null;
+};
+export type CompletedRefund = {
+  id: string;
+  order_id: string;
+  amount: number | string;
+  status: string;
+  note: string | null;
+  requested_by: string | null;
+  completed_by: string | null;
   bank_account: string | null;
   bank_name: string | null;
   account_holder: string | null;
-  created_at: string;
+  requested_at: string;
+  completed_at: string;
   customer_phone: string | null;
   customer_name: string | null;
 };
@@ -241,11 +261,23 @@ export const api = {
 
   // --- Hoàn tiền đơn CK đã trả bị huỷ ---
   getPendingRefunds: () => request<PendingRefund[]>('/refunds/pending'),
+  getCompletedRefunds: () => request<CompletedRefund[]>('/refunds/completed'),
   completeRefund: (refundId: string, note?: string) =>
     request<{ ok: boolean }>('/refunds/complete', {
       method: 'POST',
       body: { refundId, note },
     }),
+  rejectRefund: (refundId: string, reason: string) =>
+    request<{ ok: boolean }>('/refunds/reject', {
+      method: 'POST',
+      body: { refundId, reason },
+    }),
+  getRefundReconcile: () =>
+    request<{
+      matched: number;
+      onlyApp: Record<string, unknown>[];
+      onlyPos: Record<string, unknown>[];
+    }>('/refunds/reconcile'),
 
   // --- Quản trị sản phẩm ---
   listProducts: () => request<AdminProduct[]>('/products'),

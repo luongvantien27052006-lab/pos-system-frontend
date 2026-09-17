@@ -75,11 +75,19 @@ async function handle(
 
   const method = req.method.toUpperCase();
 
-  // [Chỉ ADMIN] sửa giờ mở cửa / đổi PIN -> bắt buộc cookie ADMIN.
+  // Đọc cookie phiên 1 lần -> xác định vai trò (chặn + forward cho backend).
+  const store = await cookies();
+  const cookie = store.get('staff_session')?.value;
+  const role =
+    cookie === process.env.ADMIN_SESSION_TOKEN
+      ? 'admin'
+      : cookie && cookie === process.env.STAFF_SESSION_TOKEN
+        ? 'staff'
+        : null;
+
+  // [Chỉ ADMIN] sửa giờ mở cửa / đổi PIN.
   if (isAdminOnly(path, method)) {
-    const store = await cookies();
-    const cookie = store.get('staff_session')?.value;
-    if (!cookie || cookie !== process.env.ADMIN_SESSION_TOKEN) {
+    if (role !== 'admin') {
       return NextResponse.json(
         { message: 'Chỉ quản trị viên mới được thao tác này' },
         { status: 403 },
@@ -87,18 +95,8 @@ async function handle(
     }
   } else if (isAdminPath(path)) {
     // Route quản trị -> cần đăng nhập (nhân viên hoặc admin).
-    const staff = process.env.STAFF_SESSION_TOKEN;
-    if (staff) {
-      const store = await cookies();
-      const cookie = store.get('staff_session')?.value;
-      const admin = process.env.ADMIN_SESSION_TOKEN;
-      const ok = cookie === admin || (!!cookie && cookie === staff);
-      if (!ok) {
-        return NextResponse.json(
-          { message: 'Chưa đăng nhập' },
-          { status: 401 },
-        );
-      }
+    if (process.env.STAFF_SESSION_TOKEN && !role) {
+      return NextResponse.json({ message: 'Chưa đăng nhập' }, { status: 401 });
     }
   }
 
@@ -106,6 +104,7 @@ async function handle(
   const ct = req.headers.get('content-type');
   if (ct) headers.set('content-type', ct);
   if (SECRET) headers.set('x-pos-secret', SECRET);
+  if (role) headers.set('x-pos-user', role);
 
   const hasBody = method !== 'GET' && method !== 'HEAD';
   const body = hasBody ? Buffer.from(await req.arrayBuffer()) : undefined;
