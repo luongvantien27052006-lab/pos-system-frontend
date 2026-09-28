@@ -12,12 +12,15 @@ import { Button } from '@/components/ui/button';
 import { Toast, type ToastState } from '@/components/ui/toast';
 import { FruitsAdmin } from '../fruits/fruits-admin';
 import { ToppingsAdmin } from '../toppings/toppings-admin';
+import { CategoriesAdmin } from '../categories/categories-admin';
 
 const inputClass =
   'w-full rounded-xl border bg-background px-3 py-2 outline-none transition focus:border-accent';
 
 export function ProductsAdmin() {
-  const [tab, setTab] = useState<'pos' | 'fruit' | 'topping'>('pos');
+  const [tab, setTab] = useState<'pos' | 'fruit' | 'topping' | 'category'>(
+    'pos',
+  );
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [editing, setEditing] = useState<AdminProduct | null>(null);
@@ -48,6 +51,15 @@ export function ProductsAdmin() {
       }
     })();
   }, []);
+
+  // Mở lại tab "Món POS" -> refresh danh mục (bắt danh mục vừa thêm ở tab Danh mục).
+  useEffect(() => {
+    if (tab !== 'pos') return;
+    api
+      .getMenu()
+      .then((m) => setCategories(m.categories))
+      .catch(() => undefined);
+  }, [tab]);
 
   // Xem trước ảnh: tạo & thu hồi object URL theo file
   useEffect(() => {
@@ -196,10 +208,23 @@ export function ProductsAdmin() {
         >
           Topping
         </button>
+        <button
+          type="button"
+          onClick={() => setTab('category')}
+          className={cn(
+            'px-4 py-2 text-sm font-semibold transition',
+            tab === 'category'
+              ? 'border-b-2 border-accent text-foreground'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          Danh mục
+        </button>
       </div>
 
       {tab === 'fruit' && <FruitsAdmin />}
       {tab === 'topping' && <ToppingsAdmin embedded />}
+      {tab === 'category' && <CategoriesAdmin />}
 
       {tab === 'pos' && (
       <div className="grid gap-8 lg:grid-cols-[380px_1fr]">

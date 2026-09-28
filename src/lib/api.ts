@@ -151,6 +151,13 @@ export type Bill = {
   customer?: { name: string | null; phone: string | null } | null;
   items: BillItem[];
 };
+export type AdminCategory = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  isActive: boolean;
+  productCount: number;
+};
 
 export const api = {
   // --- Menu & bàn ---
@@ -352,6 +359,19 @@ export const api = {
   restoreProduct: (id: number) =>
     request<{ ok: boolean; id: number }>(`/products/${id}/restore`, {
       method: 'PATCH',
+    }),
+
+  // --- Quản trị danh mục ---
+  listCategories: () => request<AdminCategory[]>('/categories'),
+  createCategory: (body: { name: string; displayOrder?: number }) =>
+    request<AdminCategory>('/categories', { method: 'POST', body }),
+  updateCategory: (
+    id: number,
+    body: { name?: string; displayOrder?: number; isActive?: boolean },
+  ) => request<AdminCategory>(`/categories/${id}`, { method: 'PATCH', body }),
+  deleteCategory: (id: number) =>
+    request<{ ok: boolean; id: number }>(`/categories/${id}`, {
+      method: 'DELETE',
     }),
 
   // --- Quản trị bàn ---

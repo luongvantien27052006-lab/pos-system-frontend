@@ -31,6 +31,7 @@ const SECRET = process.env.POS_PROXY_SECRET ?? '';
 // vì khách dùng chung.
 const ADMIN_PREFIXES = [
   'products',
+  'categories',
   'options',
   'vouchers',
   'news',
