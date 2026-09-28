@@ -101,6 +101,20 @@ export function ProductsAdmin() {
     if (!editing && !file)
       return setToast({ type: 'error', message: 'Chọn ảnh món ăn' });
 
+    // Cảnh báo trùng tên món (cho phép lưu nếu chủ quán vẫn muốn).
+    const nmLower = name.trim().toLowerCase();
+    const isDup = products.some(
+      (p) => p.id !== editing?.id && p.name.trim().toLowerCase() === nmLower,
+    );
+    if (
+      isDup &&
+      !confirm(
+        `Đã có món "${name.trim()}" trong danh sách. Bạn vẫn muốn lưu (có thể gây trùng tên)?`,
+      )
+    ) {
+      return;
+    }
+
     const form = new FormData();
     form.append('name', name.trim());
     form.append('price', String(Number(price)));
@@ -155,6 +169,15 @@ export function ProductsAdmin() {
   // Ảnh xem trước: ưu tiên file mới chọn, nếu đang sửa thì hiện ảnh hiện tại
   const previewSrc =
     preview ?? (editing ? resolveImageUrl(editing.imageUrl) : null);
+
+  // Trùng tên với món đã có (bỏ qua chính món đang sửa) -> cảnh báo.
+  const dupName =
+    name.trim().length > 0 &&
+    products.some(
+      (p) =>
+        p.id !== editing?.id &&
+        p.name.trim().toLowerCase() === name.trim().toLowerCase(),
+    );
 
   return (
     <main className="mx-auto min-h-dvh max-w-5xl px-5 py-8">
@@ -248,11 +271,16 @@ export function ProductsAdmin() {
           <div>
             <label className="mb-1 block text-sm font-medium">Tên món</label>
             <input
-              className={inputClass}
+              className={cn(inputClass, dupName && 'border-amber-500')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="VD: Cà phê sữa đá"
             />
+            {dupName && (
+              <p className="mt-1 text-xs font-medium text-amber-600">
+                ⚠ Đã có món tên này — kiểm tra lại để tránh trùng.
+              </p>
+            )}
           </div>
 
           <div>
