@@ -19,6 +19,7 @@ import { OrderPanel } from '@/components/pos/order-panel';
 import { ToppingSheet } from '@/components/customer/topping-sheet';
 import { BackButton } from '@/components/ui/back-button';
 import { RefundAlert } from '@/components/pos/refund-alert';
+import { ScheduledOrders } from '@/components/pos/scheduled-orders';
 
 export function PosApp() {
   const [menu, setMenu] = useState<Menu | null>(null);
@@ -104,6 +105,7 @@ export function PosApp() {
         <BackButton label="Trang chủ" href="/" />
       </div>
       <RefundAlert />
+      <ScheduledOrders />
       <PrinterAlert />
       <CashAlerts initial={alerts} />
       <OnlineOrders />

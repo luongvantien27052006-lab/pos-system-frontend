@@ -158,6 +158,23 @@ export type AdminCategory = {
   isActive: boolean;
   productCount: number;
 };
+export type ScheduledOrder = {
+  id: string;
+  scheduled_for: string;
+  created_at: string;
+  final_amount: number | string;
+  payment_method: string;
+  payment_status: string;
+  delivery_address: Record<string, unknown> | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  items: {
+    name: string | null;
+    quantity: number;
+    unit_price: number | string;
+    options: { name: string; price: number; groupName?: string | null }[] | null;
+  }[];
+};
 
 export const api = {
   // --- Menu & bàn ---
@@ -285,6 +302,7 @@ export const api = {
       onlyApp: Record<string, unknown>[];
       onlyPos: Record<string, unknown>[];
     }>('/refunds/reconcile'),
+  getScheduledOrders: () => request<ScheduledOrder[]>('/app-orders/scheduled'),
 
   // --- Quản trị sản phẩm ---
   listProducts: () => request<AdminProduct[]>('/products'),
