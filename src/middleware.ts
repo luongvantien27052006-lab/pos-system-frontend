@@ -8,7 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * Gác route sau mã PIN + phân quyền:
  *  - Admin (cookie = ADMIN_SESSION_TOKEN): toàn quyền.
- *  - Nhân viên (cookie = STAFF_SESSION_TOKEN): chỉ '/', '/pos', '/dashboard'.
+ *  - Nhân viên (cookie = STAFF_SESSION_TOKEN): chỉ '/', '/pos', '/dashboard',
+ *    '/admin/reviews'.
  *  - Route khách '/menu' luôn mở.
  */
 export function middleware(req: NextRequest) {
@@ -34,7 +35,9 @@ export function middleware(req: NextRequest) {
   const staffAllowed =
     path === '/' ||
     path.startsWith('/pos') ||
-    path.startsWith('/dashboard');
+    path.startsWith('/dashboard') ||
+    // Đánh giá món từ App: nhân viên cũng xem & xử lý đánh giá xấu.
+    path.startsWith('/admin/reviews');
   if (staffAllowed) return NextResponse.next();
 
   const url = req.nextUrl.clone();

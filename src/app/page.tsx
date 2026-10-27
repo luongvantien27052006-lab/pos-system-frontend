@@ -45,6 +45,12 @@ const surfaces = [
     tag: 'Admin',
   },
   {
+    href: '/admin/reviews',
+    title: 'Đánh giá món từ App',
+    desc: 'Đánh giá xấu cần xử lý (kèm SĐT khách) · điểm sao theo món',
+    tag: 'Thu ngân / Admin',
+  },
+  {
     href: '/admin/products',
     title: 'Quản lý món & topping',
     desc: 'Thêm món, trái cây (đồng bộ app), topping & gán topping',
@@ -80,7 +86,7 @@ export default function HomePage() {
   const adminToken = process.env.ADMIN_SESSION_TOKEN;
   const isAdmin =
     !adminToken || cookies().get('staff_session')?.value === adminToken;
-  const staffPaths = ['/menu', '/pos', '/dashboard'];
+  const staffPaths = ['/menu', '/pos', '/dashboard', '/admin/reviews'];
   const visible = isAdmin
     ? surfaces
     : surfaces.filter((s) => staffPaths.some((p) => s.href.startsWith(p)));
