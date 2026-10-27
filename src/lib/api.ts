@@ -72,6 +72,23 @@ async function request<T>(
   return (res.status === 204 ? undefined : await res.json()) as T;
 }
 
+/** Đánh giá xấu từ App — kèm liên hệ khách để quán gọi lại. */
+export type NegativeReview = {
+  id: string;
+  productId: string;
+  productName: string | null;
+  stars: number;
+  comment: string | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  orderId: string | null;
+  orderCode: string | null;
+  createdAt: string;
+  handledAt: string | null;
+  handledBy: string | null;
+  handledNote: string | null;
+};
+
 // Món trái cây (nằm ở App backend; id là UUID; kèm options size).
 export type FruitOption = {
   id: string;
@@ -534,10 +551,21 @@ export const api = {
   },
 
   // --- Đánh giá món (App đẩy sang) ---
+  /** Đánh giá XẤU (<= 3 sao): app không hiện, quán xem & xử lý. */
+  negativeReviews: (status: 'open' | 'all' = 'open') =>
+    request<NegativeReview[]>(`/reviews/negative?status=${status}`),
+  negativeReviewCount: () =>
+    request<{ open: number }>('/reviews/negative/count'),
+  setReviewHandled: (id: string, handled: boolean, note?: string) =>
+    request<{ ok: boolean }>(`/reviews/${encodeURIComponent(id)}/handled`, {
+      method: 'POST',
+      body: { handled, note },
+    }),
   reviewsSummary: () =>
     request<{
       total: number;
       avgStars: number;
+      openNegative?: number;
       perProduct: {
         productId: string;
         productName: string | null;

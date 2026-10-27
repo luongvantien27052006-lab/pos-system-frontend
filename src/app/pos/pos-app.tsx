@@ -19,6 +19,7 @@ import { OrderPanel } from '@/components/pos/order-panel';
 import { ToppingSheet } from '@/components/customer/topping-sheet';
 import { BackButton } from '@/components/ui/back-button';
 import { RefundAlert } from '@/components/pos/refund-alert';
+import { ReviewAlert } from '@/components/pos/review-alert';
 import { ScheduledOrders } from '@/components/pos/scheduled-orders';
 
 export function PosApp() {
@@ -105,6 +106,7 @@ export function PosApp() {
         <BackButton label="Trang chủ" href="/" />
       </div>
       <RefundAlert />
+      <ReviewAlert />
       <ScheduledOrders />
       <PrinterAlert />
       <CashAlerts initial={alerts} />
